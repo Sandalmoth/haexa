@@ -51,25 +51,37 @@ int main() {
 
   cout << "\nHex scalar multiplication" << endl;
   cout.precision(2);
-  for (int i = 0; i < 10; ++i) {
-    // generate some kinda pseudo-sensible decimal hex
+  for (int i = 0; i < 4; ++i) {
     int a = d_sum(rng);
     int b = d_sum(rng);
     double z = d_rounding(rng) * 3;
     haexa::Hex<int> hex(a, b, -(a + b));
-    cout << hex << " * " << z << " = " << hex*z << " = "
+    assert(hex*z == z*hex);
+    cout << hex << " * " << z << " = " << hex*z << " ≈ "
          << (hex*z).round() << '\t' << ((hex*z).round().valid() ? "ok" : "invalid") << endl;
   }
 
   cout << "\nHex scalar division" << endl;
   cout.precision(2);
-  for (int i = 0; i < 10; ++i) {
-    // generate some kinda pseudo-sensible decimal hex
+  for (int i = 0; i < 4; ++i) {
     int a = d_sum(rng);
     int b = d_sum(rng);
     double z = d_rounding(rng) * 3;
     haexa::Hex<int> hex(a, b, -(a + b));
-    cout << hex << " / " << z << " = " << hex*z << " = "
+    cout << hex << " / " << z << " = " << hex/z << " ≈ "
          << (hex/z).round() << '\t' << ((hex/z).round().valid() ? "ok" : "invalid") << endl;
+  }
+
+  cout << "\nHex comparison" << endl;
+  cout.precision(2);
+  for (int i = 0; i < 10; ++i) {
+    int a1 = d_sum(rng);
+    int b1 = d_sum(rng);
+    int a2 = d_sum(rng);
+    int b2 = d_sum(rng);
+    haexa::Hex<int> h1(a1, b1, -(a1 + b1));
+    haexa::Hex<int> h2(a2, b2, -(a2 + b2));
+    cout << h1 << " == " << h2 << ": " << (h1 == h2 ? "true" : "false") << '\t'
+         << h1 << " != " << h2 << ": " << (h1 != h2 ? "true" : "false") << endl;
   }
 }

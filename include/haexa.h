@@ -27,15 +27,14 @@ namespace haexa {
       int iz = std::round(z);
       int sum = ix + iy + iz;
       if (sum != 0) {
-        // TODO change implementation so that it works even if some diffs are equal
         double dx = fabs(x - static_cast<double>(ix));
         double dy = fabs(y - static_cast<double>(iy));
         double dz = fabs(z - static_cast<double>(iz));
         if (dx > dy && dx > dz) {
           ix = -(iy + iz);
-        } else if (dy > dx && dy > dz) {
+        } else if (dy > dz) {
           iy = -(ix + iz);
-        } else if (dz > dx && dz > dy) {
+        } else {
           iz = -(ix + iy);
         }
       }
@@ -56,9 +55,17 @@ namespace haexa {
       return Hex<T>(x + other.x, y + other.y, z + other.z);
     }
 
+    Hex<T> operator+() {
+      return Hex<T>(x, y, z);
+    }
+
     template <typename TOther>
     Hex<T> operator-(const Hex<TOther> &other) {
       return Hex<T>(x - other.x, y - other.y, z - other.z);
+    }
+
+    Hex<T> operator-() {
+      return Hex<T>(-x, -y, -z);
     }
 
     template <typename T2, typename TScalar>
@@ -70,6 +77,17 @@ namespace haexa {
     Hex<TScalar> operator/(TScalar a) {
       return Hex<TScalar>(x/a, y/a, z/a);
     }
+
+    template <typename TOther>
+    bool operator==(const Hex<TOther> &other) {
+      return (x == other.x && y == other.y && z == other.z);
+    }
+
+    template <typename TOther>
+    bool operator!=(const Hex<TOther> &other) {
+      return !((*this) == other);
+    }
+
 
 
     // Default printing
