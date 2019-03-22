@@ -6,6 +6,7 @@
 #include <cassert>
 #include <cmath>
 #include <iostream>
+#include <type_traits>
 
 
 namespace haexa {
@@ -20,16 +21,17 @@ namespace haexa {
       , z(z) { }
 
 
-    Hex<int> round() {
+    template <typename TIntegral = int>
+    Hex<TIntegral> round() {
       // return the closest integer-coordinate hex
-      int ix = std::round(x);
-      int iy = std::round(y);
-      int iz = std::round(z);
-      int sum = ix + iy + iz;
+      TIntegral ix = std::round(x);
+      TIntegral iy = std::round(y);
+      TIntegral iz = std::round(z);
+      TIntegral sum = ix + iy + iz;
       if (sum != 0) {
-        double dx = fabs(x - static_cast<double>(ix));
-        double dy = fabs(y - static_cast<double>(iy));
-        double dz = fabs(z - static_cast<double>(iz));
+        T dx = fabs(x - static_cast<T>(ix));
+        T dy = fabs(y - static_cast<T>(iy));
+        T dz = fabs(z - static_cast<T>(iz));
         if (dx > dy && dx > dz) {
           ix = -(iy + iz);
         } else if (dy > dz) {
@@ -39,7 +41,7 @@ namespace haexa {
         }
       }
       assert(ix + iy + iz == 0);
-      return Hex<int>(ix, iy, iz);
+      return Hex<TIntegral>(ix, iy, iz);
     }
 
 
@@ -73,10 +75,27 @@ namespace haexa {
     template <typename T2, typename TScalar>
     friend Hex<TScalar> operator*(TScalar, const Hex<T2> &);
 
-    template <typename TScalar>
+    // Integral division needs a special case since simple division does not
+    // guarantee correct rounding
+    template <typename TScalar,
+              typename std::enable_if<std::is_integral<TScalar>::value, int>::type = 0,
+              typename TIntermediate = double>
     Hex<TScalar> operator/(TScalar a) {
-      return Hex<TScalar>(x/a, y/a, z/a);
+      assert(a != 0);
+      TIntermediate b = 1/static_cast<TIntermediate>(a);
+      // return (Hex<TIntermediate>(x, y, z) / b).round();
+      return Hex<TIntermediate>(static_cast<TIntermediate>(x)*b,
+                                static_cast<TIntermediate>(y)*b,
+                                static_cast<TIntermediate>(z)*b).round<TScalar>();
     }
+    template <typename TScalar,
+              typename std::enable_if<std::is_floating_point<TScalar>::value, int>::type = 0>
+    Hex<TScalar> operator/(TScalar a) {
+      assert(a != 0);
+      TScalar b = 1/a;
+      return Hex<TScalar>(x*b, y*b, z*b);
+    }
+
 
     template <typename TOther>
     bool operator==(const Hex<TOther> &other) {

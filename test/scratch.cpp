@@ -72,6 +72,30 @@ int main() {
          << (hex/z).round() << '\t' << ((hex/z).round().valid() ? "ok" : "invalid") << endl;
   }
 
+  cout << "\nHex integer scalar multiplication" << endl;
+  uniform_int_distribution<int> d_iscalar(-100, 100);
+  cout.precision(2);
+  for (int i = 0; i < 4; ++i) {
+    int a = d_iscalar(rng);
+    int b = d_iscalar(rng);
+    int z = d_iscalar(rng);
+    haexa::Hex<int> hex(a, b, -(a + b));
+    assert(hex*z == z*hex);
+    cout << hex << " * " << z << " = " << hex*z
+         << '\t' << ((hex*z).valid() ? "ok" : "invalid") << endl;
+  }
+
+  cout << "\nHex integer scalar division" << endl;
+  cout.precision(2);
+  for (int i = 0; i < 4; ++i) {
+    int a = d_iscalar(rng);
+    int b = d_iscalar(rng);
+    int z = d_iscalar(rng) / 3;
+    haexa::Hex<int> hex(a, b, -(a + b));
+    cout << hex << " / " << z << " = " << hex/z
+         << '\t' << ((hex/z).valid() ? "ok" : "invalid") << endl;
+  }
+
   cout << "\nHex comparison" << endl;
   cout.precision(2);
   for (int i = 0; i < 10; ++i) {
